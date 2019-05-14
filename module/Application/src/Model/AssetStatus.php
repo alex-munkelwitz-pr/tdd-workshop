@@ -15,6 +15,11 @@ class AssetStatus implements \JsonSerializable {
         $this->createdAt = $createdAt;
     }
 
+    public static function fromNumericArray($row)
+    {
+        return new self(...$row);
+    }
+
     public function getId() {
         return $this->id;
     }

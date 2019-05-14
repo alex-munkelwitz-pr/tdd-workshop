@@ -1,5 +1,5 @@
 <?php
-namespace ApplicationTest;
+namespace ApplicationTest\Controller;
 
 use Application\Controller\IndexController;
 use Zend\Stdlib\ArrayUtils;
