@@ -57,7 +57,10 @@ return [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\AssetsController::class => function($container) {
-                return new Controller\AssetsController($container->get(\PDO::class));
+                return new Controller\AssetsController(
+                    $container->get(\PDO::class),
+                    $container->get(\Application\Model\DatabaseManager::class)
+                );
             },
             Controller\AssetStatusesController::class => function($container) {
                 return new Controller\AssetStatusesController(
@@ -78,7 +81,10 @@ return [
               $dbPassword = $dbConfig['dbpassword'];
               return new \PDO("pgsql:host={$host};port={$port};dbname={$dbName}", $dbUser, $dbPassword);
             },
-            Service\SocketManager::class => InvokableFactory::class
+            Service\SocketManager::class => InvokableFactory::class,
+            Model\DatabaseManager::class => function($container) {
+                return new Model\DatabaseManager($container->get(\PDO::class));
+            }
         ],
     ],
     'view_manager' => [

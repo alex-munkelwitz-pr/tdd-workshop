@@ -10,18 +10,17 @@ use Application\Model\AssetStatus;
 
 class AssetsController extends AbstractActionController
 {
-    private $db;
+    private $db, $databaseManager;
 
-    public function __construct(\PDO $dbConnection) {
-        $this->db = $dbConnection;
+    public function __construct(\PDO $db, \Application\Model\DatabaseManager $databaseManager) {
+        $this->db = $db;
+        $this->databaseManager = $databaseManager;
     }
 
     public function indexAction() {
         $statusType = $this->params()->fromQuery('status');
-        $result = $this->db->query("SELECT id, asset_id, status_type, created_at FROM asset_statuses WHERE status_type='{$statusType}'");
         $assets = [];
-        while ($row = $result->fetch(\PDO::FETCH_NUM)) {
-            $assetStatus = new AssetStatus(...$row);
+        foreach ($this->databaseManager->fetchByStatusType($statusType) as $assetStatus) {
             $assets[] = new Asset(
                 $assetStatus->getAssetId(),
                 $assetStatus
@@ -32,13 +31,21 @@ class AssetsController extends AbstractActionController
 
     public function getByIdAction() {
         $assetId = $this->params('id');
-        $asset = new Asset($assetId);
         $result = $this->db->query("SELECT id, asset_id, status_type, created_at FROM asset_statuses WHERE asset_id='{$assetId}'");
         if ($result->rowCount()) {
             $row = $result->fetch(\PDO::FETCH_NUM);
             $assetStatus = new AssetStatus(...$row);
-            $asset = new Asset($assetId, $assetStatus);
+            return new JsonModel((new Asset($assetId, $assetStatus))->jsonSerialize());
+        } else {
+            $this->response->setStatusCode(404);
         }
-        return new JsonModel($asset->jsonSerialize());
+    }
+
+    private function fetchByStatusType($statusType)
+    {
+        $result = $this->db->query("SELECT id, asset_id, status_type, created_at FROM asset_statuses WHERE status_type='{$statusType}'");
+        while ($row = $result->fetch(\PDO::FETCH_NUM)) {
+            yield new AssetStatus(...$row);
+        }
     }
 }
