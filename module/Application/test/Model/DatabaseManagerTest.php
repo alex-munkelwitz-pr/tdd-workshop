@@ -67,11 +67,8 @@ class DatabaseManagerTest extends TestCase
         $databaseManager = new \Application\Model\DatabaseManager($handle->reveal());
 
         $assets = [];
-        foreach ($databaseManager->fetchByStatusType($statusType) as $assetStatus) {
-            $assets[] = new Asset(
-                $assetStatus->getAssetId(),
-                $assetStatus
-            );
+        foreach ($databaseManager->fetchByStatusType($statusType) as $asset) {
+            $assets[] = $asset;
         }
         $this->assertEquals(
             array_map(

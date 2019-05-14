@@ -20,11 +20,8 @@ class AssetsController extends AbstractActionController
     public function indexAction() {
         $statusType = $this->params()->fromQuery('status');
         $assets = [];
-        foreach ($this->databaseManager->fetchByStatusType($statusType) as $assetStatus) {
-            $assets[] = new Asset(
-                $assetStatus->getAssetId(),
-                $assetStatus
-            );
+        foreach ($this->databaseManager->fetchByStatusType($statusType) as $asset) {
+            $assets[] = $asset;
         }
         return new JsonModel($assets);
     }
