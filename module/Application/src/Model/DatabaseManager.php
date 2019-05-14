@@ -15,7 +15,7 @@ class DatabaseManager
     public function fetchByStatusType($statusType)
     {
         $result = $this->db->query("SELECT id, asset_id, status_type, created_at FROM asset_statuses WHERE status_type='{$statusType}'");
-        while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
+        while ($result && $row = $result->fetch(\PDO::FETCH_ASSOC)) {
             yield call_user_func($this->assetBuilder, $row);
         }
     }
