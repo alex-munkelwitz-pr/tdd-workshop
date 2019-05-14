@@ -45,17 +45,17 @@ class DatabaseManagerTest extends TestCase
 
         $execCount = -1;
         $pdoStatement = $prophet->prophesize(\PDOStatement::class);
-        $pdoStatement->fetch(\PDO::FETCH_NUM)
-            ->shouldBeCalledTimes(3)
+        $pdoStatement->fetch(\PDO::FETCH_ASSOC)
+            ->shouldBeCalledTimes(2)
             ->will(function() use ($expectedAssetStatusRows, &$execCount) {
                 if (++$execCount === 2) {
                     return false;
                 }
                 return [
-                    $expectedAssetStatusRows[$execCount]['status']['id'],
-                    $expectedAssetStatusRows[$execCount]['status']['assetId'],
-                    $expectedAssetStatusRows[$execCount]['status']['statusType'],
-                    $expectedAssetStatusRows[$execCount]['status']['createdAt']
+                    'id' => $expectedAssetStatusRows[$execCount]['status']['id'],
+                    'asset_id' => $expectedAssetStatusRows[$execCount]['status']['assetId'],
+                    'status_type' => $expectedAssetStatusRows[$execCount]['status']['statusType'],
+                    'created_at' => $expectedAssetStatusRows[$execCount]['status']['createdAt']
                 ];
             });
 
@@ -64,7 +64,7 @@ class DatabaseManagerTest extends TestCase
             ->willReturn($pdoStatement)
             ->shouldBeCalledTimes(1);
 
-        $databaseManager = new \Application\Model\DatabaseManager($handle->reveal());
+        $databaseManager = new \Application\Model\DatabaseManager($handle->reveal(), [Asset::class, 'fromAssociativeArray']);
 
         $assets = [];
         foreach ($databaseManager->fetchByStatusType($statusType) as $asset) {
@@ -88,5 +88,4 @@ class DatabaseManagerTest extends TestCase
             $assets
         );
     }
-
 }

@@ -12,6 +12,11 @@ class Asset implements \JsonSerializable {
         $this->status = $status;
     }
 
+    public static function fromAssociativeArray($row)
+    {
+        return new self($row['asset_id'], AssetStatus::fromAssociativeArray($row));
+    }
+
     public function getId() {
         return $this->id;
     }

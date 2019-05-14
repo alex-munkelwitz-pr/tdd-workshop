@@ -83,7 +83,10 @@ return [
             },
             Service\SocketManager::class => InvokableFactory::class,
             Model\DatabaseManager::class => function($container) {
-                return new Model\DatabaseManager($container->get(\PDO::class));
+                return new Model\DatabaseManager(
+                    $container->get(\PDO::class),
+                    [Model\Asset::class, 'fromAssociativeArray']
+                );
             }
         ],
     ],
